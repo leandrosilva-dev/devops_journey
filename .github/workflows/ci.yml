@@ -35,11 +35,10 @@ jobs:
         env:
           APP_BASE_URL: http://localhost:5000
         run: |
-          # Start the Flask app in the background for integration tests
-          # We use gunicorn as specified in Dockerfile CMD
+          cd app/
           gunicorn --bind 0.0.0.0:5000 app:app &
           sleep 5
-          pytest app/integration_test.py
+          pytest integration_test.py
 
       - name: Build and Push Docker Image
         env:
