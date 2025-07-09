@@ -33,10 +33,10 @@ jobs:
 
       - name: Run Integration Tests
         env:
-          APP_BASE_URL: http://localhost:5000
+          APP_BASE_URL: http://localhost:36992
         run: |
           cd app/
-          gunicorn --bind 0.0.0.0:5000 app:app &
+          gunicorn --bind 0.0.0.0:36992 app:app &
           sleep 5
           pytest integration_test.py
 
