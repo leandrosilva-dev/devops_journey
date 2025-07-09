@@ -1,0 +1,69 @@
+.env
+
+# Python
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# Byte-code files
+app/__pycache__/
+app/*.pyc
+app/*.pyd
+app/*.pyo
+
+# Distribution / packaging
+app/.Python
+app/build/
+app/dist/
+app/*.egg-info/
+app/.installed.cfg
+app/*.egg
+
+# Testing
+app/.pytest_cache/
+app/.coverage
+app/htmlcov/
+app/.tox/
+app/.mypy_cache/
+app/.pytest_cache/
+
+# Editors and IDEs
+.idea/             # JetBrains IDEs (PyCharm, IntelliJ)
+.vscode/           # VS Code
+*.sublime-project  # Sublime Text
+*.sublime-workspace
+.DS_Store          # macOS specific
+.project
+.pydevproject
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Docker
+# Ignore Docker build context files that are temporary or large
+# For this simple app, it's less critical, but good practice for larger projects.
+# .dockerignore can also be used for this purpose within Docker builds.
+# docker-compose.override.yml # If you have local overrides not meant for repo
+
+# Kubernetes
+# Kubeconfig files (if generated locally and not managed by a secure external system)
+# Usually, these are outside the project directory or handled by cloud CLIs.
+# ~/.kube/config
+
+# Terraform
+terraform/.terraform/          # Terraform working directory (modules, providers, etc.)
+terraform/*.tfplan             # Terraform plan files
+terraform/*.tfstate            # Terraform state file (CRITICAL to ignore)
+terraform/*.tfstate.backup     # Terraform state backup files (CRITICAL to ignore)
+terraform/crash.log            # Terraform crash logs
+terraform/override.tf          # Terraform override files (if used for local dev)
+terraform/override_*.tf
+terraform/.terraform.lock.hcl  # Terraform dependency lock file (usually NOT ignored, but be aware)
+
+# GitHub Actions
+# No specific files in .github/workflows/ to ignore, as they are part of the repo.
