@@ -32,49 +32,9 @@ jobs:
         working-directory: app/
 
       - name: Run Integration Tests
-        env:
-          APP_BASE_URL: http://localhost:36992 # Environment variable for the application's base URL
         run: |
-          echo "--- Starting Gunicorn Server for Integration Tests ---"
-          # Start the Gunicorn server in the background using 'python -m gunicorn'
-          # This ensures the gunicorn module is run directly by Python, bypassing PATH issues.
-          # 'app:app' assumes you have an 'app.py' file with a Flask instance named 'app'.
-          python -m gunicorn --bind 0.0.0.0:36992 app:app &
-          
-          # Store the Process ID (PID) of the background Gunicorn process.
-          GUNICORN_PID=$! 
-          
-          echo "Waiting for Gunicorn to start on ${APP_BASE_URL}..."
-          # Loop to wait for the server to become reachable.
-          # This is more robust than a fixed 'sleep' as it checks server readiness.
-          # It will try for up to 15 seconds (15 * 1 second sleep).
-          for i in $(seq 1 15); do 
-            # Use curl to check if the server is responding. '-s' silences curl output.
-            if curl -s ${APP_BASE_URL} > /dev/null; then
-              echo "Gunicorn is up and running!"
-              break # Exit the loop if the server is up
-            fi
-            echo "Waiting... (attempt $i)"
-            sleep 1 # Wait for 1 second before retrying
-          done
-
-          # Explicitly check if the server started. If not, fail the workflow step.
-          if ! curl -s ${APP_BASE_URL} > /dev/null; then
-            echo "Error: Gunicorn did not start within the expected time. Integration tests cannot run."
-            # Attempt to kill the Gunicorn process if it's lingering, '|| true' prevents script failure if kill fails.
-            kill $GUNICORN_PID || true 
-            exit 1 # Exit with an error code to fail the GitHub Actions step
-          fi
-
-          echo "--- Running Integration Tests ---"
-          # Execute integration tests using pytest. Assumes integration_test.py is in the app/ directory.
-          pytest integration_test.py
-          
-          echo "--- Tearing down Gunicorn Server ---"
-          # Kill the Gunicorn process using its PID after tests are completed.
-          # '|| true' ensures the workflow doesn't fail if the process is already gone.
-          kill $GUNICORN_PID || true
-        # Set the working directory to 'app/' for all commands within this step
+          chmod +x run_integration_tests.sh
+          ./run_integration_tests.sh
         working-directory: app/
 
       - name: Build and Push Docker Image
