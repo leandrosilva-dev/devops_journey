@@ -13,42 +13,88 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        
+        uses: actions/checkout@v4 # Action to check out your repository code
+
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5 # Action to set up a Python environment
         with:
-          python-version: '3.9'
+          python-version: '3.9' # Specify the Python version to use. Ensure it's compatible with your app.
 
       - name: Install dependencies
         run: |
-          cd app/
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+        working-directory: app/
 
       - name: Run Unit Tests
         run: |
-          cd app/
           pytest test_app.py
+        working-directory: app/
 
       - name: Run Integration Tests
         env:
-          APP_BASE_URL: http://localhost:36992
+          APP_BASE_URL: http://localhost:36992 # Environment variable for the application's base URL
         run: |
-          cd app/
+          echo "--- Starting Gunicorn Server for Integration Tests ---"
+          # Start the Gunicorn server in the background.
+          # 'app:app' assumes you have an 'app.py' file with a Flask instance named 'app'.
           gunicorn --bind 0.0.0.0:36992 app:app &
-          sleep 5
+          
+          # Store the Process ID (PID) of the background Gunicorn process.
+          GUNICORN_PID=$! 
+          
+          echo "Waiting for Gunicorn to start on ${APP_BASE_URL}..."
+          # Loop to wait for the server to become reachable.
+          # This is more robust than a fixed 'sleep' as it checks server readiness.
+          # It will try for up to 15 seconds (15 * 1 second sleep).
+          for i in $(seq 1 15); do 
+            # Use curl to check if the server is responding. '-s' silences curl output.
+            if curl -s ${APP_BASE_URL} > /dev/null; then
+              echo "Gunicorn is up and running!"
+              break # Exit the loop if the server is up
+            fi
+            echo "Waiting... (attempt $i)"
+            sleep 1 # Wait for 1 second before retrying
+          done
+
+          # Explicitly check if the server started. If not, fail the workflow step.
+          if ! curl -s ${APP_BASE_URL} > /dev/null; then
+            echo "Error: Gunicorn did not start within the expected time. Integration tests cannot run."
+            # Attempt to kill the Gunicorn process if it's lingering, '|| true' prevents script failure if kill fails.
+            kill $GUNICORN_PID || true 
+            exit 1 # Exit with an error code to fail the GitHub Actions step
+          fi
+
+          echo "--- Running Integration Tests ---"
+          # Execute integration tests using pytest. Assumes integration_test.py is in the app/ directory.
           pytest integration_test.py
+          
+          echo "--- Tearing down Gunicorn Server ---"
+          # Kill the Gunicorn process using its PID after tests are completed.
+          # '|| true' ensures the workflow doesn't fail if the process is already gone.
+          kill $GUNICORN_PID || true
+        # Set the working directory to 'app/' for all commands within this step
+        working-directory: app/
 
       - name: Build and Push Docker Image
         env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/devops-journey
-          IMAGE_TAG: ${{ github.sha }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }} # Your Docker Hub username (stored as a GitHub Secret)
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }} # Your Docker Hub password (stored as a GitHub Secret)
+          IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/devops-journey # The name of your Docker image
+          IMAGE_TAG: ${{ github.sha }} # Use the commit SHA as the image tag for unique versions
         run: |
-          echo "--- Building Docker Image ---"
+          echo "--- Logging into Docker Hub ---"
+          # Log in to Docker Hub using your secrets
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          
+          echo "--- Building Docker Image: ${IMAGE_NAME}:${IMAGE_TAG} ---"
+          # Build the Docker image. The '.' at the end means Dockerfile is in the current directory.
+          # If your Dockerfile is located in the 'app/' directory, you would change '.' to 'app/'.
           docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          
+          echo "--- Pushing Docker Image: ${IMAGE_NAME}:${IMAGE_TAG} ---"
+          # Push the built Docker image to Docker Hub
           docker push $IMAGE_NAME:$IMAGE_TAG
-          echo "Docker image $IMAGE_NAME:$IMAGE_TAG pushed successfully."
+          echo "Docker image ${IMAGE_NAME}:${IMAGE_TAG} pushed successfully."
+        # By default, this step runs from the root of your repository.
+        # Adjust 'working-directory' here if your Dockerfile is not at the repository root.
