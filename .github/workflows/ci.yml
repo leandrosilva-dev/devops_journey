@@ -37,6 +37,7 @@ jobs:
         run: |
           # Start the Flask app in the background for integration tests
           # We use gunicorn as specified in Dockerfile CMD
+          cd app/
           gunicorn --bind 0.0.0.0:5000 app:app &
           # Wait for the app to be ready (you might use a more robust health check in production)
           sleep 5
