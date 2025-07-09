@@ -2,7 +2,7 @@ import requests
 import time
 import os
 
-BASE_URL = os.environ.get('APP_BASE_URL', 'http://localhost:36992')
+BASE_URL = os.environ.get('APP_BASE_URL', 'http://localhost:5000')
 
 def test_greet_api_integration():
     """
