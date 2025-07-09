@@ -1,5 +1,6 @@
-Flask==3.0.0 # Updated Flask version for better compatibility with Werkzeug and Python 3.12
+Flask==3.0.0 
 pytest==7.4.0
 requests==2.31.0
 python-dotenv==1.1.1
-Werkzeug>=2.3.0 # Explicitly set a compatible Werkzeug version
+Werkzeug>=2.3.0 
+gunicorn=22.0.0 
