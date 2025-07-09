@@ -36,9 +36,10 @@ jobs:
           APP_BASE_URL: http://localhost:36992 # Environment variable for the application's base URL
         run: |
           echo "--- Starting Gunicorn Server for Integration Tests ---"
-          # Start the Gunicorn server in the background.
+          # Start the Gunicorn server in the background using 'python -m gunicorn'
+          # This ensures the gunicorn module is run directly by Python, bypassing PATH issues.
           # 'app:app' assumes you have an 'app.py' file with a Flask instance named 'app'.
-          gunicorn --bind 0.0.0.0:36992 app:app &
+          python -m gunicorn --bind 0.0.0.0:36992 app:app &
           
           # Store the Process ID (PID) of the background Gunicorn process.
           GUNICORN_PID=$! 
