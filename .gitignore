@@ -28,6 +28,7 @@ app/htmlcov/
 app/.tox/
 app/.mypy_cache/
 app/.pytest_cache/
+app/coverage.xml
 
 # Editors and IDEs
 .idea/             # JetBrains IDEs (PyCharm, IntelliJ)
@@ -56,14 +57,14 @@ app/.pytest_cache/
 # ~/.kube/config
 
 # Terraform
-terraform/.terraform/          # Terraform working directory (modules, providers, etc.)
-terraform/*.tfplan             # Terraform plan files
-terraform/*.tfstate            # Terraform state file (CRITICAL to ignore)
-terraform/*.tfstate.backup     # Terraform state backup files (CRITICAL to ignore)
-terraform/crash.log            # Terraform crash logs
-terraform/override.tf          # Terraform override files (if used for local dev)
-terraform/override_*.tf
-terraform/.terraform.lock.hcl  # Terraform dependency lock file (usually NOT ignored, but be aware)
+terraform/environments/dev/aws/.terraform/          # Terraform working directory (modules, providers, etc.)
+terraform/environments/dev/aws/*.tfplan             # Terraform plan files
+terraform/environments/dev/aws/*.tfstate            # Terraform state file (CRITICAL to ignore)
+terraform/environments/dev/aws/*.tfstate.backup     # Terraform state backup files (CRITICAL to ignore)
+terraform/environments/dev/aws/crash.log            # Terraform crash logs
+terraform/environments/dev/aws/override.tf          # Terraform override files (if used for local dev)
+terraform/environments/dev/aws/override_*.tf
+terraform/environments/dev/aws/.terraform/*
 
 # GitHub Actions
 # No specific files in .github/workflows/ to ignore, as they are part of the repo.
