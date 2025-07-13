@@ -1,0 +1,34 @@
+# Ignore Git-related files
+.git
+.gitignore
+
+# Ignore Python specific files and directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+*.egg-info/
+.pytest_cache/
+
+# Ignore common IDE/editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore Docker-related files (if in root of project)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Ignore logs, temporary files, and data
+*.log
+tmp/
+*.db

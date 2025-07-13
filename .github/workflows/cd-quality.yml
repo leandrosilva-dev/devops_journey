@@ -3,20 +3,25 @@ name: Terraform Provisioning - Develop branch
 on:
   workflow_dispatch:
   push:
+    branches:
+      - develop
     paths:
       - 'terraform/**'
 
   workflow_run:
-    workflows: ["CI Pipeline - Develop branch"]
+    workflows: ["CI Pipeline - Build and Test"]
     types:
       - completed
 
 jobs:
   deploy-terraform:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
