@@ -1,0 +1,58 @@
+name: CI Pipeline - Build and Test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # Action to check out your repository code
+
+      - name: Set up Python
+        uses: actions/setup-python@v5 # Action to set up a Python environment
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: app/
+
+      - name: Run Unit Tests
+        run: |
+          pytest test_app.py
+        working-directory: app/
+
+      - name: Run Integration Tests
+        run: |
+          chmod +x run_integration_tests.sh
+          ./run_integration_tests.sh
+        working-directory: app/
+
+      - name: Build and Push Docker Image
+        if: github.event_name == 'push'
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ECR_REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}
+          AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
+        run: |
+          echo "--- Logging into AWS ECR ---"
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ECR_REGISTRY
+
+          echo "--- Building Docker Image: $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.sha }} ---"
+          docker build -t $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.sha }} .
+
+          echo "--- Pushing Docker Image to ECR ---"
+          docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.sha }}
+          echo "Docker image pushed to ECR: $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.sha }}"
+        working-directory: app/
