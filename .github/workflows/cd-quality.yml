@@ -37,6 +37,17 @@ jobs:
         run: terraform init
         working-directory: terraform/environments/dev/aws/
 
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+        working-directory: terraform/environments/dev/aws/
+      
+      - name: Run Checkov IaC security scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: terraform/
+          output_format: cli
+          soft_fail: false
+      
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: terraform/environments/dev/aws/

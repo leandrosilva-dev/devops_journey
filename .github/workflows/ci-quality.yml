@@ -58,3 +58,11 @@ jobs:
           docker push $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.sha }}
           echo "Docker image pushed to ECR: $AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.sha }}"
         working-directory: app/
+
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: '$AWS_ECR_REGISTRY/$AWS_ECR_REPOSITORY:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          severity: 'LOW,HIGH,CRITICAL'
