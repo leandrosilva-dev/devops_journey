@@ -1,5 +1,6 @@
 # Dockerfile
-FROM python:3.9-alpine AS builder
+# Use an official Python runtime as a parent image
+FROM python:3.12-slim-bookworm
 
 WORKDIR /app
 
