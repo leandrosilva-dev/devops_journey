@@ -3,6 +3,9 @@ FROM python:3.9-alpine AS builder
 
 WORKDIR /app
 
+RUN apt-get update && apt-get upgrade -y && apt-get clean
+
+# Copy the requirements file into the container at /app
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt \
