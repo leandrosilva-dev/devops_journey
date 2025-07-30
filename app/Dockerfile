@@ -13,18 +13,6 @@ COPY requirements.txt .
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN apt-get purge -y \
-    libpam-modules \
-    libpam-modules-bin \
-    libpam-runtime \
-    libpam0g \
-    perl-base && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN apt-get purge -y zlib1g && apt-get autoremove -y
-
 # Copy the application code into the container at /app
 COPY app.py .
 
