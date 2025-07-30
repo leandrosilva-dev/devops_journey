@@ -9,17 +9,22 @@ RUN apt-get update && apt-get upgrade -y && apt-get clean
 # Copy the requirements file into the container at /app
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt \
-    && rm -rf /root/.cache/pip
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-FROM python:3.9-alpine
+RUN apt-get purge -y \
+    libpam-modules \
+    libpam-modules-bin \
+    libpam-runtime \
+    libpam0g \
+    perl-base && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+RUN apt-get purge -y zlib1g && apt-get autoremove -y
 
-COPY --from=builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
-
-COPY --from=builder /usr/local/bin/gunicorn /usr/local/bin/
-
+# Copy the application code into the container at /app
 COPY app.py .
 
 EXPOSE 5000
