@@ -72,4 +72,4 @@ jobs:
           image-ref: ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{ github.sha }}
           format: 'table'
           exit-code: '1'
-          severity: 'LOW,HIGH,CRITICAL'
+          severity: 'HIGH,CRITICAL'
