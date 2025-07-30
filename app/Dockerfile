@@ -5,6 +5,8 @@ FROM python:3.9-slim-buster
 # Set the working directory in the container
 WORKDIR /app
 
+RUN apt-get update && apt-get upgrade -y && apt-get clean
+
 # Copy the requirements file into the container at /app
 COPY requirements.txt .
 
