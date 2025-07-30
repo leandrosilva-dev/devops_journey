@@ -1,4 +1,6 @@
 CVE-2023-45853  # zlib1g - will_not_fix
 CVE-2025-6020   # libpam - monitor
 CVE-2025-6965   # sqlite - monitor
-CVE-2025-4802   # glibc - monitor
+CVE-2025-4802   # libc-bin - monitor
+CVE-2023-31484  # perl-base
+CVE-2024-6827   # gunicorn (METADATA)
