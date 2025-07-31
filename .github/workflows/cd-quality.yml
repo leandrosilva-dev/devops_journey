@@ -31,7 +31,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # Change to your AWS region
+          aws-region: us-east-2
 
       - name: Terraform Init
         run: terraform init
@@ -49,5 +49,6 @@ jobs:
           soft_fail: false
       
       - name: Terraform Apply
+        if: github.event_name == 'push'
         run: terraform apply -auto-approve
         working-directory: terraform/environments/dev/aws/
